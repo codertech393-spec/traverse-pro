@@ -30,7 +30,7 @@ type PackageData = {
 
 /* ---------------- CONFIG ---------------- */
 
-const API_URL = "http://localhost:1337/api";
+const API_URL = "https://enduring-ducks-6d60e5bfb7.strapiapp.com/api";
 
 /* ---------------- ICON LOGIC ---------------- */
 

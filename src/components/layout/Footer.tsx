@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import traverselogo from '../../assets/images/traverse-logo.svg'
 
 const Footer: React.FC = () => {
   return (
@@ -9,7 +10,7 @@ const Footer: React.FC = () => {
           {/* Brand */}
           <div>
             <div className="flex items-center gap-3">
-              <div className="h-9 w-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600" />
+            <img src={traverselogo} alt="logo" className="h-8 w-8"/>
               <span className="text-lg font-semibold text-white">
                 Traverse Pro
               </span>
