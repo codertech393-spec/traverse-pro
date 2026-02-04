@@ -6,10 +6,12 @@ import Home from "./pages/Home";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import TrackingPage from "./pages/TrackingPage";
+import ScrollToTop from "./components/ScrollToTop ";
 
 function App() {
   return (
     <BrowserRouter>
+    <ScrollToTop />
       <Header />
 
       <Routes>

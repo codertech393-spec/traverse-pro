@@ -1,4 +1,5 @@
 import Hero from "../components/sections/Hero";
+import { Link } from "react-router-dom";
 
 type Testimonial = {
   name: string;
@@ -272,11 +273,13 @@ const Home = () => {
         </p>
 
         <div className="mt-10">
-          <button
-            className="rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 px-8 py-4 text-sm font-medium text-white shadow-lg shadow-purple-600/30 transition hover:scale-[1.02] hover:shadow-purple-600/50 active:scale-[0.98]"
-          >
-            Track your shipment
-          </button>
+      <Link to="/track">
+  <button
+    className="rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 px-8 py-4 text-sm font-medium text-white shadow-lg shadow-purple-600/30 transition hover:scale-[1.02] hover:shadow-purple-600/50 active:scale-[0.98]"
+  >
+    Track your shipment
+  </button>
+</Link>
         </div>
       </div>
     </section>
