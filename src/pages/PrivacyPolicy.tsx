@@ -147,7 +147,7 @@ const PrivacyPolicy: React.FC = () => {
           </PolicySection>
 
           <PolicySection title="Contact Us">
-            <p>Email: privacy@Traversehaulage@gmail.com</p>
+            <p>Email: Traversehaulage@gmail.com</p>
             <p className="mt-2">
               Traverse Pro Privacy Team<br />
               San Francisco, CA 94102, United States
