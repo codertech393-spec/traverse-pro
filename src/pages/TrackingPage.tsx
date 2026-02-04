@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-
 import {
   CheckCircle,
   Truck,
   MapPin,
   Package,
   Inbox,
+  AlertTriangle,
 } from "lucide-react";
 
 /* ---------------- TYPES ---------------- */
@@ -30,26 +30,47 @@ type PackageData = {
 
 /* ---------------- CONFIG ---------------- */
 
-const API_URL = "https://enduring-ducks-6d60e5bfb7.strapiapp.com/api";
+const API_URL =
+  "https://enduring-ducks-6d60e5bfb7.strapiapp.com/api";
 
 /* ---------------- ICON LOGIC ---------------- */
 
 const getEventIcon = (status: string) => {
+  const s = status.toLowerCase();
   const base = "h-5 w-5";
 
-  if (status.toLowerCase().includes("delivered"))
+  if (s.includes("delivered"))
     return <CheckCircle className={`${base} text-green-400`} />;
 
-  if (status.toLowerCase().includes("out"))
+  if (s.includes("delayed"))
+    return <AlertTriangle className={`${base} text-red-400`} />;
+
+  if (s.includes("custom"))
+    return <Package className={`${base} text-orange-400`} />;
+
+  if (s.includes("departed"))
     return <Truck className={`${base} text-blue-400`} />;
 
-  if (status.toLowerCase().includes("transit"))
+  if (s.includes("out"))
+    return <Truck className={`${base} text-blue-400`} />;
+
+  if (s.includes("transit"))
     return <MapPin className={`${base} text-blue-400`} />;
 
-  if (status.toLowerCase().includes("transfer"))
-    return <Package className={`${base} text-blue-400`} />;
+  if (s.includes("received"))
+    return <Inbox className={`${base} text-blue-400`} />;
 
-  return <Inbox className={`${base} text-blue-400`} />;
+  return <Inbox className={`${base} text-slate-400`} />;
+};
+
+const getStatusColor = (status: string) => {
+  const s = status.toLowerCase();
+
+  if (s.includes("delivered")) return "text-green-400";
+  if (s.includes("delayed")) return "text-red-400";
+  if (s.includes("custom")) return "text-orange-400";
+
+  return "text-blue-400";
 };
 
 /* ---------------- PAGE ---------------- */
@@ -62,23 +83,15 @@ const TrackingPage = () => {
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
-  const tn = searchParams.get("tn");
-  if (tn) {
-    setTrackingNumber(tn);
-  }
-}, [searchParams]);
+    const tn = searchParams.get("tn");
+    if (tn) setTrackingNumber(tn);
+  }, [searchParams]);
 
-useEffect(() => {
-  if (trackingNumber) {
-    fetchTracking();
-  }
-}, [trackingNumber]);
-
-
+  useEffect(() => {
+    if (trackingNumber) fetchTracking();
+  }, [trackingNumber]);
 
   const fetchTracking = async () => {
-    if (!trackingNumber.trim()) return;
-
     setLoading(true);
     setError("");
     setPkg(null);
@@ -90,16 +103,15 @@ useEffect(() => {
 
       const json = await res.json();
 
-      if (!json.data || json.data.length === 0) {
+      if (!json.data?.length) {
         setError("Tracking number not found");
         return;
       }
 
       const data = json.data[0];
 
-      // Sort events newest → oldest
       const sortedEvents = [...data.trackingEvents].sort(
-        (a: TrackingEvent, b: TrackingEvent) =>
+        (a, b) =>
           new Date(b.timestamp).getTime() -
           new Date(a.timestamp).getTime()
       );
@@ -113,7 +125,7 @@ useEffect(() => {
         carrierChain: data.carrierChain,
         trackingEvents: sortedEvents,
       });
-    } catch (err) {
+    } catch {
       setError("Failed to load tracking information");
     } finally {
       setLoading(false);
@@ -123,13 +135,11 @@ useEffect(() => {
   return (
     <main className="min-h-screen bg-[#020617] px-4 py-20 text-white">
       <div className="mx-auto max-w-4xl">
-        {/* Header */}
-        <h1 className="text-3xl font-semibold mb-2">Tracking Details</h1>
-        <p className="text-slate-400 mb-8">
-          Track every step of your package journey
-        </p>
+        <h1 className="text-3xl font-semibold mb-6">
+          Tracking Details
+        </h1>
 
-        {/* Input */}
+        {/* INPUT */}
         <div className="flex gap-3 mb-10">
           <input
             value={trackingNumber}
@@ -150,71 +160,65 @@ useEffect(() => {
 
         {pkg && (
           <>
-            {/* SUMMARY */}
-            <div className="rounded-2xl bg-white/5 p-6 mb-10 border border-white/10">
-              <p className="text-sm text-slate-400">Tracking Number</p>
-              <p className="font-mono text-lg">{pkg.trackingNumber}</p>
+          {/* SUMMARY */}
+<div className="rounded-2xl bg-white/5 p-6 mb-10 border border-white/10">
+  <p className="text-sm text-slate-400">Tracking Number</p>
+  <p className="font-mono text-lg mb-4">{pkg.trackingNumber}</p>
 
-              <div className="mt-4">
-                <p
-                  className={`font-medium ${
-                    pkg.staTus.toLowerCase().includes("delivered")
-                      ? "text-green-400"
-                      : "text-blue-400"
-                  }`}
-                >
-                  {pkg.staTus}
-                </p>
+  <div className="mb-4">
+    <p className={`font-medium ${getStatusColor(pkg.staTus)}`}>
+      {pkg.staTus}
+    </p>
 
-                <p className="text-sm text-slate-300">
-                  {pkg.currentLocation}
-                </p>
+    <p className="text-sm text-slate-300">
+      {pkg.currentLocation}
+    </p>
 
-                <p className="text-sm text-slate-400">
-                  Estimated delivery: {pkg.estimatedDelivery}
-                </p>
-              </div>
+    <p className="text-sm text-slate-400">
+      Estimated delivery: {pkg.estimatedDelivery}
+    </p>
+  </div>
 
-              <div className="mt-4 text-sm text-slate-400">
-                Carrier chain: {pkg.carrierChain}
-              </div>
-            </div>
+  {/* Divider */}
+  <div className="my-4 h-px bg-white/10" />
 
-            {/* TRACKING HISTORY */}
+  {/* DESTINATION + CARRIER */}
+  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+    <div>
+      <p className="text-slate-400 mb-1">Carrier Chain</p>
+      <p className="text-slate-200">{pkg.carrierChain}</p>
+    </div>
+
+    <div>
+      <p className="text-slate-400 mb-1">Destination</p>
+      <p className="text-slate-200">{pkg.destination}</p>
+    </div>
+  </div>
+</div>
+
+
+            {/* TIMELINE */}
             <div className="relative rounded-2xl bg-white/5 p-6 border border-white/10">
               <h2 className="text-xl font-semibold mb-6">
                 Tracking History
               </h2>
 
-              {/* Vertical line */}
               <div className="absolute left-[45px] top-[72px] bottom-10 w-px bg-white/10" />
 
               <ul className="space-y-8">
                 {pkg.trackingEvents.map((event) => (
-                  <li key={event.id} className="relative flex gap-4">
-                    {/* Icon */}
-                    <div className="relative z-10 flex h-11 w-11 items-center justify-center rounded-full bg-[#0b1220] border border-white/10">
+                  <li key={event.id} className="flex gap-4">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#0b1220] border border-white/10">
                       {getEventIcon(event.staTus)}
                     </div>
 
-                    {/* Content */}
                     <div>
-                      <p
-                        className={`font-medium ${
-                          event.staTus
-                            .toLowerCase()
-                            .includes("delivered")
-                            ? "text-green-400"
-                            : "text-blue-400"
-                        }`}
-                      >
+                      <p className={`font-medium ${getStatusColor(event.staTus)}`}>
                         {event.staTus}
                       </p>
-
                       <p className="text-sm text-slate-300">
                         {event.location}
                       </p>
-
                       <p className="text-xs text-slate-500 mt-1">
                         {new Date(event.timestamp).toLocaleString()}
                       </p>
@@ -222,19 +226,6 @@ useEffect(() => {
                   </li>
                 ))}
               </ul>
-            </div>
-
-            {/* CTA */}
-            <div className="mt-10 flex justify-center">
-              <button
-                onClick={() => {
-                  setPkg(null);
-                  setTrackingNumber("");
-                }}
-                className="rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 px-8 py-4 text-sm font-medium shadow-lg"
-              >
-                Track Another Package
-              </button>
             </div>
           </>
         )}
