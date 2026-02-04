@@ -43,10 +43,10 @@ const getEventIcon = (status: string) => {
     return <CheckCircle className={`${base} text-green-400`} />;
 
   if (s.includes("delayed"))
-    return <AlertTriangle className={`${base} text-red-400`} />;
+    return <AlertTriangle className={`${base} text-blue-400`} />;
 
   if (s.includes("custom"))
-    return <Package className={`${base} text-orange-400`} />;
+    return <Package className={`${base} text-blue-400`} />;
 
   if (s.includes("departed"))
     return <Truck className={`${base} text-blue-400`} />;
@@ -67,8 +67,8 @@ const getStatusColor = (status: string) => {
   const s = status.toLowerCase();
 
   if (s.includes("delivered")) return "text-green-400";
-  if (s.includes("delayed")) return "text-red-400";
-  if (s.includes("custom")) return "text-orange-400";
+  if (s.includes("delayed")) return "text-blue-400";
+  if (s.includes("custom")) return "text-blue-400";
 
   return "text-blue-400";
 };
